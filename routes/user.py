@@ -106,3 +106,33 @@ def get_meal_orders():
         order["_id"] = str(order["_id"])
         order["userId"] = str(order["userId"])
     return jsonify(orders)
+
+@user_bp.route('/api/user/meals/orders', methods=['POST'])
+def book_meal_order():
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No input data provided"}), 400
+
+    # Validate required fields (simplified validation)
+    required_fields = ['userId', 'bookingDate', 'selectedMeals']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"message": f"Missing field: {field}"}), 400
+
+    # Convert bookingDate from ISO format to a datetime object
+    try:
+        # Replace 'Z' with '+00:00' for proper parsing if needed.
+        data["bookingDate"] = datetime.fromisoformat(data["bookingDate"].replace("Z", "+00:00"))
+    except Exception as e:
+        return jsonify({"message": "Invalid bookingDate format"}), 400
+
+    # Optionally, add createdAt timestamp
+    data["createdAt"] = datetime.utcnow()
+
+    # Insert the meal order document into the meal_orders collection
+    result = db.meal_orders.insert_one(data)
+
+    return jsonify({
+        "message": "Meal order booked successfully",
+        "orderId": str(result.inserted_id)
+    }), 201

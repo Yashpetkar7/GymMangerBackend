@@ -42,12 +42,16 @@ def login():
 
     user = db.users.find_one({"username": username})
     if user and user.get("password") == password:
+        # Concatenate firstName and lastName to form fullName
+        fullName = f"{user['personalDetails'].get('firstName', '')} {user['personalDetails'].get('lastName', '')}"
         # For simplicity, return user id (you can implement JWT later)
         return jsonify({
             "success": True,
             "token": str(user["_id"]),  # using _id as token
             "role": user["role"],
-            "userId": str(user["_id"])
+            "userId": str(user["_id"]),
+            "fullName": fullName
         })
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
+

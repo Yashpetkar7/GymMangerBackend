@@ -45,5 +45,5 @@ def get_all_requests():
     requests_list = list(db.requests.find())
     for req in requests_list:
         req["_id"] = str(req["_id"])
-        req["userId"] = str(req["userId"])
+        # req["userId"] = str(req["userId"])
     return jsonify(requests_list)
